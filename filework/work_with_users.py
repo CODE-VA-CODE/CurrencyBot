@@ -10,17 +10,17 @@ def write_user_data(usersData):
         usersFile.writelines(usersData)
 
 
-def change_user_data(usn, requests):  # USN - User String Number
-    usersData = read_user_data()  # data[0] = "UserNickName;user_id;userFirstName;userLastName;userRequestsToBot;"
-    usn_list = usersData[usn].split(";")
-    usn_list[-1] = requests
-
-    usersData[usn] = ""
-    for i in usn_list:
-        usersData[usn] += i + ";"
-    usersData[usn] += "\n"
-
-    write_user_data(usersData)
+# def change_user_data(usn, requests):  # USN - User String Number
+#     usersData = read_user_data()  # data[0] = "UserNickName;user_id;userFirstName;userLastName;"
+#     usn_list = usersData[usn].split(";")
+#     usn_list[-1] = requests
+#
+#     usersData[usn] = ""
+#     for i in usn_list:
+#         usersData[usn] += i + ";"
+#     usersData[usn] += "\n"
+#
+#     write_user_data(usersData)
 
 
 def get_users_list():
