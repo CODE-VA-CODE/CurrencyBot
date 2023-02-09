@@ -3,6 +3,7 @@ import requests
 
 from config import BOT_TOKEN, CURRENCY_API
 from filework.work_with_users import *
+from user_Ban import userIsBlockd
 
 bot = telebot.TeleBot(BOT_TOKEN)
 
@@ -20,7 +21,7 @@ users = get_users_list()  # никнейм пользователя - ключ :
 
 # print (data)
 
-user_requests = dict()  # user_id - ключ : значение - количество запросов пользователя
+users_requests = dict()  # user_id - ключ : значение - количество запросов пользователя
 
 
 
@@ -40,11 +41,17 @@ def help_message(message):
     bot.send_message(message.chat.id, "Чтобы начать работать со мной, вы можете нажать на кнопку рядом с полем ввода"
                                       " и тогда вам будет доступен список популярных валют, если вы хотите узнать"
                                       " данные по другим валютам, напишите мне стандартное 3х буквенное обозначение"
-                                      " валюту - Пример:\nTRY - Турецкая лира")
+                                      " валюту - Пример:\nTRY - Турецкая лира\n" 
+                                      "Если вы сделаете больше 5 запросов за 1 минут, вы будете заблокированны на 10 "
+                                      "минут")
 
 
 @bot.message_handler(content_types=["text"])
 def echo_message(message):
+    er = False
+    if (userIsBlockd(message.from_user.id)):
+        bot.send_message(message.chat.id, "Вы были заблокированны за спам, ждите!")
+        return
     if (message.text.upper() == "GALEON"):  # Маленькая пасхалка :)
         bot.send_message(message.chat.id, f"1 Золотой Галеон - 1981,48 RUB")   # 1 галлеон = 1981,48 рублей;
         bot.send_message(message.chat.id, f"1 Серебрянный Сикль - 118,89 RUB")  # 1 сикль = 118,89 рублей;
@@ -64,6 +71,13 @@ def echo_message(message):
 
             except KeyError:
                 bot.send_message(message.chat.id, "Ошибка, такой валюты не существует")
+                er = True
+    if(not er):
+        global users_requests
+        if(message.from_user.id not in users_requests):
+            users_requests[message.from_user.id] = 1
+        else:
+            users_requests[message.from_user.id] += 1
 
 
 bot.polling(none_stop=True)
